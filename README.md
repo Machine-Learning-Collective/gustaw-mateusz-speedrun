@@ -41,7 +41,7 @@ You've been summoned to build a **Personal Chatbot** — the most basic of bots,
 - Raw dicts crossing boundaries → *Pydantic didn't die for this*
 
 ### ✅ Based Moves (XP Multipliers)
-- Asking clarifying questions → *big brain energy*
+- Asking clarifying questions → *big brain energy, DM papa*
 - Documenting in GitHub issues → *audit trail supremacy*
 - Isolated pytest tests → *chef's kiss*
 - Clean git history → *immaculate vibes*
