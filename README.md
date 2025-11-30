@@ -5,7 +5,7 @@
 ## 🧙‍♂️ The Party (Who's Grinding This Quest)
 
 | Hero Name | Class | Discord Handle | Sync Days | Raid Time |
-|-----------|-------|----------------|-----------|-----------|
+|Mateusz|Technowizard|vetekinna_60775|24.11|IDK : D |
 | | | | | |
 | | | | | |
 
