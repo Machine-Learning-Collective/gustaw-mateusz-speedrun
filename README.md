@@ -6,7 +6,7 @@
 
 | Hero Name | Class | Discord Handle | Sync Days | Raid Time |
 |-----------|-------|----------------|-----------|-----------|
-| Hero Name | Class | Discord Handle | Sync Days | Raid Time | |Mateusz|Technowizard|vetekinna_60775|24.11|IDK : D |
+|Mateusz|Technowizard|vetekinna_60775|24.11|IDK : D |
 | | | | | |
 
 > ⚠️ **Fill this out first or you're literally cooked**
