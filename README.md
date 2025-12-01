@@ -6,7 +6,7 @@
 
 | Hero Name | Class | Discord Handle | Sync Days | Raid Time |
 |-----------|-------|----------------|-----------|-----------|
-| | | | | |
+|Mateusz|Technowizard|vetekinna_60775|24.11|IDK : D |
 | | | | | |
 
 > ⚠️ **Fill this out first or you're literally cooked**
@@ -18,7 +18,7 @@
 You've been summoned to build a **Personal Chatbot** — the most basic of bots, yet infinitely extensible. Think of it as the tutorial boss before the real game begins.
 
 **The Stack (Your Loadout):**
-- 🧠 **LangChain** — The brain (makes bot go brrr)
+- 🧠 **LangChain** — The brain (makes bot go brr)
 - 📝 **Pydantic** — The bouncer (no sus data allowed)
 - 🎨 **Streamlit** — The face (pretty UI, no cap)
 - 🚀 **FastAPI** — The optional drip (API layer if you're feeling spicy)
