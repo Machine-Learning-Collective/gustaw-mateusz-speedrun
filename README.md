@@ -117,7 +117,7 @@ uv run uvicorn FastApi_Skeleton.main:app --reload
 
 ### Step 7: Run the UI (Streamlit Chat)
 ```bash
-uv run streamlit run streamlit_app.py
+uv streamlit run src/Streamlit_Interface/app.py 
 ```
 ---
 
