@@ -30,19 +30,6 @@ def test_chat_response_roundtrip() -> None:
     assert resp2 == resp
 
 
-def test_chat_request_with_config_overrides_serialization() -> None:
-    msg = Message(role=Role.user, content="hello")
-    cfg = ConversationConfig(locale="pl", max_history_messages=42)
-    req = ChatRequest(session_id="sess", message=msg, config_overrides=cfg)
-
-    data = req.model_dump()
-    req2 = ChatRequest.model_validate(data)
-    assert req2.session_id == "sess"
-    assert req2.config_overrides is not None
-    assert req2.config_overrides.locale == "pl"
-    assert req2.config_overrides.max_history_messages == 42
-
-
 def test_conversation_config_roundtrip_json() -> None:
     cfg = ConversationConfig(
         system_prompt="Test prompt",

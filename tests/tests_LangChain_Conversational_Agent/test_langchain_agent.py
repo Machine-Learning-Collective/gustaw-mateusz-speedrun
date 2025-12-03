@@ -1,7 +1,7 @@
 import pytest
 from langchain_community.chat_models.fake import FakeListChatModel
 
-from LangChain_Conversational_Agent.langchain_agent import LangChainAgent
+from LangChain_Conversational_Agent import LangChainAgent
 from Pydantic_Base_Models import ConversationConfig, Role
 
 
@@ -17,8 +17,11 @@ def make_agent(responses=None, max_history_messages=20) -> LangChainAgent:
     cfg = ConversationConfig(
         system_prompt="You are a test bot.",
         max_history_messages=max_history_messages,
+        input_key="messages",
+        memory_key="messages",
     )
-    return LangChainAgent(llm=llm, config=cfg)
+    # UWAGA: aktualny konstruktor ma nazwany parametr `model`, nie `llm`
+    return LangChainAgent(model=llm, tools=None, config=cfg)
 
 
 def test_conversation_flow_two_turns() -> None:
@@ -32,6 +35,7 @@ def test_conversation_flow_two_turns() -> None:
     assert isinstance(r2, str)
 
     history = agent.get_history(session_id=session_id)
+    # 2 tury => 4 wiadomości (user, assistant, user, assistant)
     assert len(history) == 4
     assert history[0].role == Role.user
     assert history[1].role == Role.assistant
@@ -81,8 +85,11 @@ def test_multiple_sessions_isolated() -> None:
     history_a = agent.get_history(session_id="A")
     history_b = agent.get_history(session_id="B")
 
+    # sesja A: 2 tury => 4 message
     assert len(history_a) == 4
+    # sesja B: 1 tura => 2 message
     assert len(history_b) == 2
+
     assert any(m.content == "hello A1" for m in history_a)
     assert any(m.content == "hello A2" for m in history_a)
     assert any(m.content == "hello B1" for m in history_b)
@@ -92,6 +99,7 @@ def test_multiple_sessions_isolated() -> None:
 def test_empty_input_does_not_crash() -> None:
     agent = make_agent()
     out = agent.send("", session_id="empty")
+    # send zwraca tekst z modelu, nawet jeśli input był pusty
     assert isinstance(out, str)
 
 
@@ -111,6 +119,7 @@ def test_history_trimming_respects_max_history_messages() -> None:
     agent.send("m3", session_id=session_id)
 
     history = agent.get_history(session_id=session_id)
+    # max_history_messages = 4 => w historii zostają ostatnie 4 wiadomości
     assert len(history) == 4
 
     user_messages = [m.content for m in history if m.role == Role.user]

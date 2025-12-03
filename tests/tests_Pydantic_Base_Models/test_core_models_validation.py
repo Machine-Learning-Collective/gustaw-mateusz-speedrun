@@ -54,8 +54,6 @@ def test_chat_turn_valid() -> None:
 
 
 def test_chat_request_valid() -> None:
-    msg = Message(role=Role.user, content="hello")
-    req = ChatRequest(session_id="sess-1", message=msg)
+    req = ChatRequest(session_id="sess-1", message="hello")
     assert req.session_id == "sess-1"
-    assert req.message is msg
-    assert req.config_overrides is None
+    assert req.message == "hello"

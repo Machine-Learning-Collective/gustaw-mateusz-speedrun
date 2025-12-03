@@ -1,42 +1,58 @@
+# streamlit_app.py
+import uuid
+import requests
 import streamlit as st
 
-from Pydantic_Base_Models import Message, Role
-from Streamlit_Interface.ui_shell import ChatUIShell, mock_responder
+BACKEND_URL = "http://127.0.0.1:8000/chat"
 
 
-SESSION_ID = "streamlit-session"
+def get_session_id():
+    if "session_id" not in st.session_state:
+        st.session_state.session_id = str(uuid.uuid4())
+    return st.session_state.session_id
 
 
-def get_shell() -> ChatUIShell:
-    if "ui_shell" not in st.session_state:
-        st.session_state.ui_shell = ChatUIShell(responder=mock_responder)
-    return st.session_state.ui_shell
+def get_messages():
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    return st.session_state.messages
 
 
-def render_history(shell: ChatUIShell) -> None:
-    history = shell.get_history(SESSION_ID)
-    for msg in history:
-        if msg.role is Role.user:
-            with st.chat_message("user"):
-                st.markdown(msg.content)
-        elif msg.role is Role.assistant:
-            with st.chat_message("assistant"):
-                st.markdown(msg.content)
+st.set_page_config(page_title="Chatbot", page_icon="💬")
+st.title("Chatbot (FastAPI + LangChain + Streamlit)")
 
+session_id = get_session_id()
+messages = get_messages()
 
-def main() -> None:
-    st.title("Streamlit Chat Interface")
+for msg in messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
-    shell = get_shell()
-    render_history(shell)
+user_input = st.chat_input("Type your message...")
 
-    if prompt := st.chat_input("Type your message"):
-        reply = shell.send(prompt, session_id=SESSION_ID)
-        with st.chat_message("user"):
-            st.markdown(prompt)
+if user_input:
+    messages.append({"role": "user", "content": user_input})
+    with st.chat_message("user"):
+        st.markdown(user_input)
+
+    payload = {
+        "message": user_input,
+        "session_id": session_id,
+    }
+
+    try:
+        resp = requests.post(BACKEND_URL, json=payload, timeout=30)
+    except Exception as e:
         with st.chat_message("assistant"):
-            st.markdown(reply.content)
+            st.error(f"Backend error: {e}")
+    else:
+        if resp.status_code != 200:
+            with st.chat_message("assistant"):
+                st.error(f"API error {resp.status_code}: {resp.text}")
+        else:
+            data = resp.json()
+            assistant_text = data["message"]["content"]
 
-
-if __name__ == "__main__":
-    main()
+            messages.append({"role": "assistant", "content": assistant_text})
+            with st.chat_message("assistant"):
+                st.markdown(assistant_text)

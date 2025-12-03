@@ -36,9 +36,8 @@ class ChatTurn(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    session_id: str = Field(min_length=1, max_length=128)
-    message: Message
-    config_overrides: Optional[ConversationConfig] = None
+    message: str
+    session_id: str | None = None
 
 
 class ChatResponse(BaseModel):

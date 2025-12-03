@@ -1,52 +1,86 @@
 from typing import Dict, List, Optional
 
-from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain.agents import create_agent
+from langchain.tools import BaseTool
 from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.language_models.chat_models import BaseChatModel
 
 from Pydantic_Base_Models import ConversationConfig, Message, Role
+
+class ChatModelError(Exception):
+    """Raised when the underlying chat model call fails."""
+    pass
 
 
 class LangChainAgent:
     def __init__(
         self,
-        llm: BaseChatModel,
+        model: BaseChatModel,
+        tools: Optional[List[BaseTool]] = None,
         config: Optional[ConversationConfig] = None,
     ) -> None:
         self.config = config or ConversationConfig()
-        self.llm = llm
+        self.model = model
+        self.tools = tools or []
         self._store: Dict[str, ChatMessageHistory] = {}
 
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", self.config.system_prompt),
-                MessagesPlaceholder(self.config.memory_key),
-                ("human", "User: {" + self.config.input_key + "}"),
-            ]
+        self._agent = create_agent(
+            model=self.model,
+            tools=self.tools,
+            system_prompt=self.config.system_prompt,
         )
 
-        chain = prompt | self.llm
-
-        self._chain = RunnableWithMessageHistory(
-            chain,
-            self._get_history,
-            input_messages_key=self.config.input_key,
-            history_messages_key=self.config.memory_key,
-        )
-
+    # --- wewnętrzna historia LangChain ---
     def _get_history(self, session_id: str) -> ChatMessageHistory:
         if session_id not in self._store:
             self._store[session_id] = ChatMessageHistory()
         return self._store[session_id]
 
+    # --- główna metoda: wysyłamy input, budujemy pełne messages i zapisujemy historię ---
     def send(self, user_input: str, session_id: str = "default") -> str:
-        result = self._chain.invoke(
-            {self.config.input_key: user_input},
-            config={"configurable": {"session_id": session_id}},
-        )
+        history = self._get_history(session_id)
+
+        messages = []
+        for m in history.messages:
+            if m.type == "human":
+                role = "user"
+            elif m.type == "ai":
+                role = "assistant"
+            else:
+                role = "system"
+            messages.append({"role": role, "content": m.content})
+
+        messages.append({"role": "user", "content": user_input})
+
+        try:
+            result = self._agent.invoke({"messages": messages})
+        except Exception as e:
+            raise ChatModelError("LLM call failed") from e
+
+        reply = self._extract_reply(result)
+
+        history.add_user_message(user_input)
+        history.add_ai_message(reply)
+
         self._trim_history(session_id=session_id)
-        return result.content
+
+        return reply
+
+    def _extract_reply(self, result) -> str:
+        # typowy format: {"messages": [AIMessage(...), ...]}
+        if isinstance(result, dict) and "messages" in result:
+            msgs = result["messages"]
+            if isinstance(msgs, list) and msgs:
+                last = msgs[-1]
+                if hasattr(last, "content"):
+                    return last.content
+                if isinstance(last, dict) and "content" in last:
+                    return last["content"]
+
+        if isinstance(result, dict) and "output" in result:
+            return result["output"]
+
+        return str(result)
 
     def _trim_history(self, session_id: str) -> None:
         max_messages = self.config.max_history_messages
@@ -58,6 +92,7 @@ class LangChainAgent:
             excess = len(messages) - max_messages
             history.messages = messages[excess:]
 
+    # --- publiczna historia jako Pydantic List[Message] ---
     def get_history(self, session_id: str = "default") -> List[Message]:
         history = self._get_history(session_id).messages
         result: List[Message] = []
@@ -77,31 +112,3 @@ class LangChainAgent:
 
     def has_session(self, session_id: str) -> bool:
         return session_id in self._store
-
-
-if __name__ == "__main__":
-    from langchain_community.chat_models.fake import FakeListChatModel
-
-    responses = [
-        "Hello, how can I help you?",
-        "I see.",
-        "Can you tell me more?",
-        "Thanks for sharing.",
-    ]
-    llm = FakeListChatModel(responses=responses)
-    agent = LangChainAgent(llm=llm, config=ConversationConfig())
-
-    session_id = "cli"
-    print("Type 'exit' to quit.")
-    while True:
-        try:
-            text = input("you> ").strip()
-        except (EOFError, KeyboardInterrupt):
-            print("\nbye")
-            break
-        if text.lower() in {"exit", "quit"}:
-            print("bye")
-            break
-        if not text:
-            print("agent> Please say something.")
-            continue
