@@ -100,7 +100,24 @@ uv lock
 # Sync your environment from lock file
 uv sync
 ```
+### Step 4: Configure Your Secrets
+create file .env and fill 
 
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL_NAME=gpt-4o-mini
+
+
+
+### Step 6: Run the Backend (FastAPI + LangChain Agent)
+```bash
+uv run uvicorn FastApi_Skeleton.main:app --reload
+```
+
+
+### Step 7: Run the UI (Streamlit Chat)
+```bash
+uv run streamlit run streamlit_app.py
+```
 ---
 
 ## 🗺️ The Quest Log (Milestones)
