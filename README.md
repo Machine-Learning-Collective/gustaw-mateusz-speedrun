@@ -101,11 +101,12 @@ uv lock
 uv sync
 ```
 ### Step 4: Configure Your Secrets
-create file .env and fill 
+create file .env and fill it out
 
+```bash
 OPENAI_API_KEY=sk-...
 OPENAI_MODEL_NAME=gpt-4o-mini
-
+```
 
 
 ### Step 6: Run the Backend (FastAPI + LangChain Agent)
