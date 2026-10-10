@@ -1,29 +1,25 @@
 [project]
 name = "gustaw-mateusz-speedrun"
-version = "0.1.0"
+version = "1.0.0"
 description = "Conversational chatbot built from isolated, tested components: LangChain, Pydantic, FastAPI and Streamlit"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.122.0",
-    "langchain>=0.3.0",
+    "langchain-core>=1.0,<2",
+    "langchain-openai>=1.0,<2",
     "pydantic>=2.12.5",
+    "python-dotenv>=1.0",
     "streamlit>=1.51.0",
-
-    "langchain-community>=0.3.0",
     "uvicorn[standard]>=0.30.0",
 ]
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0.1",
-]
-
-[project.optional-dependencies]
-dev = [
+    "httpx>=0.28",
     "pytest>=9.0.1",
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]

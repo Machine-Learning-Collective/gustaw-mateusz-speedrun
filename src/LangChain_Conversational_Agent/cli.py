@@ -1,27 +1,19 @@
 # cli.py
-import sys
+from dotenv import load_dotenv
+from pydantic import ValidationError
 
-from langchain_community.chat_models.fake import FakeListChatModel
-
-from Pydantic_Base_Models import ConversationConfig
 from LangChain_Conversational_Agent.langchain_agent import LangChainAgent
+from LangChain_Conversational_Agent.llm_factory import LLMSettings, build_llm
+from Pydantic_Base_Models import ConversationConfig
 
 
 def main() -> None:
-    llm = FakeListChatModel(
-        responses=[
-            "Hello, how can I help you?",
-            "I see.",
-            "Can you tell me more?",
-            "Thanks for sharing.",
-        ]
-    )
-
-    config = ConversationConfig()
-    agent = LangChainAgent(llm=llm, config=config)
+    load_dotenv()
+    settings = LLMSettings.from_env()
+    agent = LangChainAgent(llm=build_llm(settings), config=ConversationConfig())
     session_id = "cli"
 
-    print("Type 'exit' to quit.")
+    print(f"Model: {settings.describe()}. Type 'exit' to quit, 'reset' to start over.")
     while True:
         try:
             user_input = input("you> ").strip()
@@ -32,15 +24,23 @@ def main() -> None:
         if user_input.lower() in {"exit", "quit"}:
             print("bye")
             break
-
+        if user_input.lower() == "reset":
+            agent.reset(session_id)
+            print("agent> Conversation cleared.")
+            continue
         if not user_input:
             print("agent> Please say something.")
             continue
 
-        reply = agent.send(user_input=user_input, session_id=session_id)
+        try:
+            reply = agent.send(user_input=user_input, session_id=session_id)
+        except ValidationError as exc:
+            print(f"agent> {exc.errors()[0]['msg']}")
+            continue
+        except Exception as exc:
+            print(f"agent> The language model request failed: {exc}")
+            continue
         print(f"agent> {reply}")
-
-    sys.exit(0)
 
 
 if __name__ == "__main__":
