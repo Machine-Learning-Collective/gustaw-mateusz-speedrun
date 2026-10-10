@@ -1,190 +1,86 @@
-# 🎮 Personal Chatbot Speedrun Any% (No Glitches)
+# Personal Chatbot
 
-> *"It's not about the destination, it's about the friends we made along the way... and the bugs we introduced."*
+A conversational chatbot built in **ML Kolektyw** (Machine Learning Collective, PJATK) by Gustaw Pluta ([@GustawP](https://github.com/GustawP)) and Mateusz ([@mmalimon](https://github.com/mmalimon)).
 
-## 🧙‍♂️ The Party (Who's Grinding This Quest)
+The project is deliberately built in stages: every technology is researched and validated before any code is written, and every component is built and tested in isolation before the pieces are connected.
 
-| Hero Name | Class | Discord Handle | Sync Days | Raid Time |
-|-----------|-------|----------------|-----------|-----------|
-|Mateusz|Technowizard|vetekinna_60775|24.11|IDK : D |
-|Gustaw|DPS|.gustaw|24.11|IDK : P|
+## Stack
 
----
+| Layer | Technology | Role |
+|---|---|---|
+| Conversation logic | **LangChain** | Prompt template, per-session memory, model abstraction |
+| Data contracts | **Pydantic v2** | Validated models for every message crossing a component boundary |
+| UI | **Streamlit** | Chat interface |
+| API | **FastAPI** | HTTP layer |
+| Tests | **pytest** | One test suite per component |
+| Environment | **uv**, Python 3.13 | Dependency management and lock file |
 
-## 📜 The Lore (What Even Is This)
+## Status
 
-You've been summoned to build a **Personal Chatbot** — the most basic of bots, yet infinitely extensible. Think of it as the tutorial boss before the real game begins.
+| Milestone | Scope | Status |
+|---|---|---|
+| 1 | Research and technology validation | ✅ Done |
+| 2 | Isolated components | ✅ Done |
+| 3 | Integration and demo | ⏳ Next |
+| 4 | Reflection and handoff | – |
 
-**The Stack (Your Loadout):**
-- 🧠 **LangChain** — The brain (makes bot go brr)
-- 📝 **Pydantic** — The bouncer (no sus data allowed)
-- 🎨 **Streamlit** — The face (pretty UI, no cap)
-- 🚀 **FastAPI** — The optional drip (API layer if you're feeling spicy)
-- 🧪 **Pytest** — The reality check (tests or it didn't happen)
+The components exist and pass their tests, but are not yet connected. The agent currently runs against a scripted test model, and the UI against a mock responder; wiring them together with a real LLM is Milestone 3.
 
-**Your Mission:**
-1. Research everything (no speedrunning this part fr fr)
-2. Build components in isolation (trust the process bestie)
-3. Integrate them (this is where it gets real)
-4. Document your Ls and Ws (self-awareness arc)
+## Components
 
----
-
-## ⚔️ The Rules of Engagement
-
-### 🚫 Forbidden Techniques (Instant Game Over)
-- Writing code before researching → *skill issue*
-- Skipping isolation testing → *that's not very cash money*
-- Merging without PR approval → *caught in 4K*
-- Raw dicts crossing boundaries → *Pydantic didn't die for this*
-
-### ✅ Based Moves (XP Multipliers)
-- Asking clarifying questions → *big brain energy, DM papa*
-- Documenting in GitHub issues → *audit trail supremacy*
-- Isolated pytest tests → *chef's kiss*
-- Clean git history → *immaculate vibes*
-
----
-
-## 🏕️ Setting Up Camp (Environment Setup)
-
-### Step 1: Summon UV (Package Manager Diff)
-
-```bash
-**If you don't have uv yet, install it (it's bussin)**
-`curl -LsSf https://astral.sh/uv/install.sh | sh`
-
-Or if you're on Windows (no shade)
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+src/
+├── Pydantic_Base_Models/            Message, ChatRequest, ChatResponse, ConversationConfig
+├── LangChain_Conversational_Agent/  LangChainAgent: prompt + per-session history + trimming
+├── Streamlit_Interface/             Chat UI shell with a pluggable responder
+└── FastApi_Skeleton/                FastAPI app with a /health endpoint
 ```
 
-### Step 2: Create Your Lair
+**Data models.** Every message is a `Message` with a role, timestamp and validated content (1–4000 characters, whitespace-only rejected). `ConversationConfig` holds the system prompt, history length limit and locale (`en`/`pl`). Raw dicts never cross component boundaries.
+
+**Agent.** `LangChainAgent` takes any LangChain chat model, so the provider can be swapped without touching the rest of the code. It keeps a separate history per session through `RunnableWithMessageHistory` and trims it to `max_history_messages` after each turn.
+
+**UI.** The Streamlit shell takes the reply function as a dependency. Today that is a mock; in Milestone 3 it becomes the agent.
+
+**API.** A FastAPI app with a typed `/health` endpoint, as the base for a `/chat` route.
+
+## Research (Milestone 1)
+
+Before writing code, each part of the stack was researched against official documentation and the version set was validated for conflicts. The findings and decisions are in [`docs/`](docs/):
+
+| Document | Covers |
+|---|---|
+| [milestone-1-research.md](docs/milestone-1-research.md) | Overview of all decisions: LLM provider, versions, testing strategy, architecture |
+| [langchain-core-abstractions.md](docs/langchain-core-abstractions.md) | Chat models, prompts, runnables, memory |
+| [pydantic-message-handling.md](docs/pydantic-message-handling.md) | Message models, validation, serialization |
+| [streamlit-chat-ui-interaction.md](docs/streamlit-chat-ui-interaction.md) | Chat elements, session state, rerun model |
+| [version-compatibility-validation.md](docs/version-compatibility-validation.md) | Version matrix, dependency resolution, known conflicts |
+
+The original project brief is kept in [docs/project-brief.md](docs/project-brief.md).
+
+## Running it
 
 ```bash
-# Clone the repo (you know the drill)
-git clone <your-assigned-repo-url>
-cd <repo-name>
-
-# Spawn a virtual environment
-uv venv
-
-# Activate it
-source .venv/bin/activate  # Unix/macOS
-# OR
-.venv\Scripts\activate     # Windows
-```
-
-### Step 3: Add Your Dependencies
-
-```bash
-# Add packages as you need them (research first tho)
-uv add <package-name>
-
-# Need a specific version? Say less
-uv add <package-name>==<version>
-
-# Dev dependencies (testing stuff)
-uv add --dev <package-name>
-```
-
-> 🚨 **IMPORTANT:** You decide which packages and versions to use. That's literally the quest. Check the docs, validate compatibility, ask questions if confused. No hand-holding here bestie.
-
-### Step 4: Lock It In
-
-```bash
-# This creates/updates uv.lock (commit this file)
-uv lock
-
-# Sync your environment from lock file
 uv sync
+
+# Tests
+uv run pytest
+
+# Agent in the terminal (scripted test model, no API key needed)
+uv run python -m LangChain_Conversational_Agent.cli
+
+# Chat UI (mock responder)
+uv run streamlit run src/Streamlit_Interface/app.py
+
+# API
+uv run uvicorn FastApi_Skeleton.main:app --app-dir src
 ```
 
----
+## Team
 
-## 🗺️ The Quest Log (Milestones)
+| | Role |
+|---|---|
+| Gustaw Pluta | Research and technology validation (Milestone 1), project lead |
+| Mateusz (@mmalimon) | Isolated components and tests (Milestone 2) |
 
-| Phase | Milestone | Vibe Check |
-|-------|-----------|------------|
-| 1️⃣ | Research & Technology Validation | *"I actually read the docs"* |
-| 2️⃣ | Isolated Component Proof | *"It works on my machine (in isolation)"* |
-| 3️⃣ | Integration & Demo | *"Witness me"* |
-| 4️⃣ | Reflection & Handoff | *"Character development arc complete"* |
-
-### 🌿 Branch Strategy (Don't Be Sus)
-
-```
-main (protected - no direct pushes, srs)
-├── milestone-1/research
-├── milestone-2/isolated-components
-├── milestone-3/integration
-└── milestone-4/reflection
-```
-
-**Workflow:**
-1. Create branch from \`main\` for your milestone
-2. Work on issues, commit often (atomic commits = based)
-3. Open PR when milestone complete
-4. Get approved by reviewer (that's @ArturNiklewicz)
-5. Merge and level up 🎉
-
----
-
-## 📚 The Sacred Texts (Documentation)
-
-### Core Technologies
-| Tech | Docs | Why You Need This |
-|------|------|-------------------|
-| 🐍 Python | [docs.python.org](https://docs.python.org/3/) | ...seriously? |
-| 📦 uv | [docs.astral.sh/uv](https://docs.astral.sh/uv/) | Package manager that doesn't make you mass |
-| 🧠 LangChain | [python.langchain.com/docs](https://python.langchain.com/docs/introduction/) | The chatbot brain docs |
-| 📝 Pydantic | [docs.pydantic.dev](https://docs.pydantic.dev/latest/) | Data validation bible (USE V2) |
-| 🧪 Pytest | [docs.pytest.org](https://docs.pytest.org/en/stable/) | Testing framework goat |
-| 🚀 FastAPI | [fastapi.tiangolo.com](https://fastapi.tiangolo.com/) | API framework that's actually good |
-| 🎨 Streamlit | [docs.streamlit.io](https://docs.streamlit.io/) | UI framework for the lazy (affectionate) |
-
-### Bonus Reading (Side Quests)
-| Resource | Link | Vibe |
-|----------|------|------|
-| Git Branching | [learngitbranching.js.org](https://learngitbranching.js.org/) | Interactive git tutorial |
-| Conventional Commits | [conventionalcommits.org](https://www.conventionalcommits.org/) | Commit message etiquette |
-| Python Type Hints | [mypy.readthedocs.io](https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html) | Types are your friend |
-
----
-
-## 🎯 Evaluation Criteria (How You Get Judged)
-
-| Criteria | Weight | What We're Looking For |
-|----------|--------|------------------------|
-| 🤔 Asking Clarifying Questions | HIGH | You ask before assuming |
-| 📖 Research Rigor | HIGH | Official docs > Stack Overflow copypasta |
-| 🧩 Code Isolation | HIGH | Components work alone before together |
-| 🌿 Git Hygiene | MEDIUM | Clean history, good PR descriptions |
-| 📝 Documentation | MEDIUM | Your issues tell the story |
-
----
-
-## 💀 Common L's (Don't Be This Person)
-
-- *"I'll just figure it out as I go"* → Research milestone exists for a reason
-- *"Tests are optional right?"* → They are not. Pytest or perish.
-- *"I'll document later"* → You won't. Document in issues AS YOU GO.
-- *"Let me just merge real quick"* → PR gate exists. Respect it.
-
----
-
-## 🏆 GG WP (Success Criteria)
-
-By the end, you should have:
-- [ ] A working chatbot (even if basic)
-- [ ] Clean, isolated components
-- [ ] Documented decision trail in GitHub issues
-- [ ] Honest self-assessment
-- [ ] Zero regrets (okay maybe some regrets)
-
----
-
-> *"The real chatbot was the documentation we wrote along the way."*
->
-> — Ancient Developer Proverb, probably
-
-**Now go touch grass (after you finish the milestone). GLHF! 🚀**
+Work happens on milestone branches and is merged through reviewed pull requests.

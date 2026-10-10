@@ -4,7 +4,7 @@ import sys
 from langchain_community.chat_models.fake import FakeListChatModel
 
 from Pydantic_Base_Models import ConversationConfig
-from langchain_agent import LangChainAgent
+from LangChain_Conversational_Agent.langchain_agent import LangChainAgent
 
 
 def main() -> None:

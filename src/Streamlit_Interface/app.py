@@ -1,4 +1,10 @@
+import sys
+from pathlib import Path
+
 import streamlit as st
+
+# `streamlit run` puts only this file's folder on the import path; add src/ so sibling packages import.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from Pydantic_Base_Models import Message, Role
 from Streamlit_Interface.ui_shell import ChatUIShell, mock_responder
