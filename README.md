@@ -112,7 +112,7 @@ curl -X POST localhost:8000/chat -H 'content-type: application/json' \
 
 | | Role |
 |---|---|
-| Gustaw Pluta | Project lead; research and technology validation (M1); integration and handoff (M3–M4) |
-| Mateusz (@mmalimon) | Isolated components and tests (M2) |
+| Gustaw Pluta | Project lead; research and technology validation (M1); merged integration, fixes, CI and handoff (M3–M4) |
+| Mateusz (@mmalimon) | Isolated components and tests (M2); first end-to-end integration (M3, Dec 2025, branch `milestone-3/End-to-End-Demo`) |
 
 Work happens on milestone branches and is merged through reviewed pull requests.

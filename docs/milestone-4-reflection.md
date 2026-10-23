@@ -9,8 +9,9 @@
 | 21 Nov 2025 | Project brief |
 | 27 Nov 2025 | Milestone 1 merged: research and version validation (5 documents) |
 | 1 Dec 2025 | Milestone 2 merged: isolated components, 25 tests |
+| 4 Dec 2025 | First end-to-end integration by Mateusz on `milestone-3/End-to-End-Demo`, never merged |
 | Dec 2025 – Sep 2026 | Paused |
-| Oct 2026 | Milestones 3 and 4: integration, fixes, CI, documentation |
+| Oct 2026 | Milestones 3 and 4 completed: integration merged, fixes, CI, documentation |
 
 ## What worked
 
@@ -21,6 +22,9 @@
 **Pydantic at the boundaries.** Validation written once in the models gave the API correct 422 responses for free, and the same models drive the UI's error messages.
 
 ## What did not, and what we take from it
+
+**Finished work sat on an unmerged branch.** Mateusz had already connected the agent to OpenAI, added `/chat` and pointed the UI at the API in December 2025, but the branch was never reviewed or merged, so ten months later the integration was done a second time. His branch also could not pass CI as it stood: its tests needed a live API key, and the API raised `http.client.HTTPException` instead of FastAPI's, which would have turned model errors into a 500.
+→ *A branch nobody reviews is invisible. Open the pull request when the work starts, not when it is perfect.*
 
 **Nobody ran the tests from a clean checkout.** For ten months, a plain `pytest` from the project root failed on all five test modules, and `uv run pytest` would have failed on a missing dependency. Everyone ran tests in an already-configured local environment, so nobody noticed.
 → *CI from the first commit. A test suite only counts if it runs somewhere other than the author's machine.*

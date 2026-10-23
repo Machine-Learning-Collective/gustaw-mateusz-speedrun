@@ -4,6 +4,8 @@
 
 Milestone 2 left four components that worked alone: data models, an agent running on a scripted test model, a Streamlit shell with a mock responder, and a FastAPI app with only `/health`. This milestone connects them to each other and to a real language model.
 
+A first integration was written by Mateusz in December 2025 on the `milestone-3/End-to-End-Demo` branch: it connected the agent to OpenAI, added a `/chat` endpoint and made the Streamlit UI call the API. That branch was never merged and could not run in CI (its tests needed a live API key). The version merged here was rebuilt on `main` with demo mode, a shared service layer and full test coverage. Ideas worth carrying over from his branch are listed under [Next steps](#next-steps).
+
 ## Architecture
 
 ```mermaid
@@ -89,3 +91,9 @@ Put them in `.env` (see `.env.example`). Tests force `LLM_PROVIDER=demo`, so a k
 | Streamlit UI (AppTest) | 4 |
 
 They run on every push and pull request in GitHub Actions (`.github/workflows/tests.yml`).
+
+## Next steps
+
+From Mateusz's December branch, not yet in `main`:
+- **UI talking to the API** instead of calling the service directly, so the UI and API share one conversation history.
+- **Agent built with `create_agent`** and a `tools.py` prepared for retrieval (RAG), which is the natural way to give the bot access to documents.
