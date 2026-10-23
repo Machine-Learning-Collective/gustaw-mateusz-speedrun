@@ -9,9 +9,9 @@ from pydantic import ValidationError
 # `streamlit run` puts only this file's folder on the import path; add src/ so sibling packages import.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from Chat_Service import ChatService  # noqa: E402
-from LangChain_Conversational_Agent.llm_factory import LLMSettings  # noqa: E402
-from Pydantic_Base_Models import ChatRequest, ConversationConfig, Message, Role  # noqa: E402
+from chat_service import ChatService  # noqa: E402
+from langchain_conversational_agent.llm_factory import LLMSettings  # noqa: E402
+from pydantic_base_models import ChatRequest, ConversationConfig, Message, Role  # noqa: E402
 
 DEFAULT_SYSTEM_PROMPT = ConversationConfig().system_prompt
 

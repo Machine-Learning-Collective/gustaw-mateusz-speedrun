@@ -2,8 +2,8 @@ import pytest
 from langchain_core.language_models.fake_chat_models import FakeListChatModel
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
-from LangChain_Conversational_Agent.langchain_agent import LangChainAgent
-from Pydantic_Base_Models import MAX_USER_MESSAGE_CHARS, ConversationConfig, Role
+from langchain_conversational_agent.langchain_agent import LangChainAgent
+from pydantic_base_models import MAX_USER_MESSAGE_CHARS, ConversationConfig, Role
 from tests.conftest import FailingChatModel, RecordingChatModel
 
 

@@ -37,10 +37,10 @@ uv sync
 cp .env.example .env    # then put your OPENAI_API_KEY in .env
 
 # Web UI
-uv run streamlit run src/Streamlit_Interface/app.py
+uv run streamlit run src/streamlit_interface/app.py
 
 # REST API (docs at http://localhost:8000/docs)
-uv run uvicorn FastApi_Skeleton.main:app --app-dir src
+uv run uvicorn fastapi_skeleton.main:app --app-dir src
 
 # Terminal
 uv run python main.py
@@ -74,11 +74,11 @@ flowchart LR
 
 ```
 src/
-├── Pydantic_Base_Models/            Message, ChatRequest, ChatResponse, ConversationConfig
-├── LangChain_Conversational_Agent/  Agent with per-session history; model factory; CLI
-├── Chat_Service/                    Single entry point for API and UI
-├── FastApi_Skeleton/                REST API
-└── Streamlit_Interface/             Web UI
+├── pydantic_base_models/            Message, ChatRequest, ChatResponse, ConversationConfig
+├── langchain_conversational_agent/  Agent with per-session history; model factory; CLI
+├── chat_service/                    Single entry point for API and UI
+├── fastapi_skeleton/                REST API
+└── streamlit_interface/             Web UI
 ```
 
 ### API

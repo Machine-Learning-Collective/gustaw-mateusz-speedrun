@@ -2,8 +2,8 @@ import threading
 
 import pytest
 
-from Chat_Service import ChatService
-from Pydantic_Base_Models import ChatRequest, ConversationConfig, Message, Role
+from chat_service import ChatService
+from pydantic_base_models import ChatRequest, ConversationConfig, Message, Role
 from tests.conftest import RecordingChatModel
 
 

@@ -1,7 +1,7 @@
 import pytest
 from langchain_core.messages import HumanMessage
 
-from LangChain_Conversational_Agent.llm_factory import DEFAULT_OPENAI_MODEL, DemoChatModel, LLMSettings, build_llm
+from langchain_conversational_agent.llm_factory import DEFAULT_OPENAI_MODEL, DemoChatModel, LLMSettings, build_llm
 
 
 def test_no_key_means_demo_mode() -> None:

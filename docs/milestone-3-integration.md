@@ -10,10 +10,10 @@ A first integration was written by Mateusz in December 2025 on the `milestone-3/
 
 ```mermaid
 flowchart LR
-    UI["Streamlit UI<br/>src/Streamlit_Interface"] -->|ChatRequest| S
-    API["FastAPI<br/>src/FastApi_Skeleton"] -->|ChatRequest| S
+    UI["Streamlit UI<br/>src/streamlit_interface"] -->|ChatRequest| S
+    API["FastAPI<br/>src/fastapi_skeleton"] -->|ChatRequest| S
     CLI["Terminal CLI<br/>main.py"] --> A
-    S["ChatService<br/>src/Chat_Service"] -->|one agent per config| A["LangChainAgent"]
+    S["ChatService<br/>src/chat_service"] -->|one agent per config| A["LangChainAgent"]
     A -->|prompt + history| F{"LLM factory"}
     F -->|OPENAI_API_KEY set| O["ChatOpenAI"]
     F -->|no key| D["DemoChatModel"]
