@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from Pydantic_Base_Models import (
+from pydantic_base_models import (
     Role,
     Message,
     ChatTurn,

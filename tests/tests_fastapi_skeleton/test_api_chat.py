@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
 
-from Chat_Service import ChatService
-from FastApi_Skeleton.main import create_app
-from Pydantic_Base_Models import MAX_USER_MESSAGE_CHARS
+from chat_service import ChatService
+from fastapi_skeleton.main import create_app
+from pydantic_base_models import MAX_USER_MESSAGE_CHARS
 from tests.conftest import FailingChatModel, RecordingChatModel
 
 
@@ -59,7 +59,7 @@ def test_health_reports_provider(recording_llm: RecordingChatModel) -> None:
 
 
 def test_default_app_runs_in_demo_mode_without_key() -> None:
-    from FastApi_Skeleton.main import app
+    from fastapi_skeleton.main import app
 
     client = TestClient(app)
     assert client.get("/health").json()["llm_provider"] == "demo"

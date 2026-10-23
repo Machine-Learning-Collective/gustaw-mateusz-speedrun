@@ -2,9 +2,9 @@
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
-from LangChain_Conversational_Agent.langchain_agent import LangChainAgent
-from LangChain_Conversational_Agent.llm_factory import LLMSettings, build_llm
-from Pydantic_Base_Models import ConversationConfig
+from langchain_conversational_agent.langchain_agent import LangChainAgent
+from langchain_conversational_agent.llm_factory import LLMSettings, build_llm
+from pydantic_base_models import ConversationConfig
 
 
 def main() -> None:

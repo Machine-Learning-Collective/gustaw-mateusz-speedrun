@@ -2,7 +2,7 @@ from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
 
-APP = str(Path(__file__).resolve().parents[2] / "src" / "Streamlit_Interface" / "app.py")
+APP = str(Path(__file__).resolve().parents[2] / "src" / "streamlit_interface" / "app.py")
 
 
 def test_app_starts_in_demo_mode() -> None:

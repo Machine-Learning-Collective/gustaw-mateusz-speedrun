@@ -4,7 +4,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-from Pydantic_Base_Models import ConversationConfig, Message, Role
+from pydantic_base_models import ConversationConfig, Message, Role
 
 # session_id -> messages of that session, oldest first
 HistoryStore = Dict[str, List[Message]]

@@ -3,9 +3,9 @@ from typing import Dict, List, Optional
 
 from langchain_core.language_models.chat_models import BaseChatModel
 
-from LangChain_Conversational_Agent.langchain_agent import HistoryStore, LangChainAgent
-from LangChain_Conversational_Agent.llm_factory import LLMSettings, build_llm
-from Pydantic_Base_Models import ChatRequest, ChatResponse, ConversationConfig, Message
+from langchain_conversational_agent.langchain_agent import HistoryStore, LangChainAgent
+from langchain_conversational_agent.llm_factory import LLMSettings, build_llm
+from pydantic_base_models import ChatRequest, ChatResponse, ConversationConfig, Message
 
 
 class ChatService:

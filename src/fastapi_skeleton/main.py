@@ -4,9 +4,9 @@ from typing import List, Optional
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 
-from Chat_Service import ChatService
-from LangChain_Conversational_Agent.llm_factory import LLMSettings
-from Pydantic_Base_Models import ChatRequest, ChatResponse, HealthResponse, Message
+from chat_service import ChatService
+from langchain_conversational_agent.llm_factory import LLMSettings
+from pydantic_base_models import ChatRequest, ChatResponse, HealthResponse, Message
 
 APP_VERSION = "1.0.0"
 

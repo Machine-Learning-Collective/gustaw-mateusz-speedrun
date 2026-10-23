@@ -60,9 +60,9 @@
 
 | Task | Where |
 |---|---|
-| Add a provider (e.g. Anthropic, a local model) | Add it to `Provider` and a branch in `build_llm()` in `src/LangChain_Conversational_Agent/llm_factory.py` |
+| Add a provider (e.g. Anthropic, a local model) | Add it to `Provider` and a branch in `build_llm()` in `src/langchain_conversational_agent/llm_factory.py` |
 | Persist history | Replace the `HistoryStore` dictionary passed to `LangChainAgent` by `ChatService` with a database-backed mapping |
-| Change limits or validation | `src/Pydantic_Base_Models/chat.py` |
-| New API endpoint | `create_app()` in `src/FastApi_Skeleton/main.py`, using `ChatService` via `Depends(get_service)` |
+| Change limits or validation | `src/pydantic_base_models/chat.py` |
+| New API endpoint | `create_app()` in `src/fastapi_skeleton/main.py`, using `ChatService` via `Depends(get_service)` |
 
 **Suggested next steps, in order of value:** persistent history (SQLite is enough), authentication and rate limiting on the API, streaming replies, the UI talking to the API instead of the service, a second provider.
