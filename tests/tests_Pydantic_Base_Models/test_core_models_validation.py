@@ -59,3 +59,14 @@ def test_chat_request_valid() -> None:
     assert req.session_id == "sess-1"
     assert req.message is msg
     assert req.config_overrides is None
+
+
+def test_assistant_message_may_exceed_user_limit() -> None:
+    # Real model replies can be long; only what a person sends is capped.
+    m = Message(role=Role.assistant, content="x" * 10_000)
+    assert len(m.content) == 10_000
+
+
+def test_created_at_is_timezone_aware() -> None:
+    m = Message(role=Role.user, content="hi")
+    assert m.created_at.tzinfo is not None

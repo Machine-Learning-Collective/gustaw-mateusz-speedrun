@@ -1,190 +1,118 @@
-# 🎮 Personal Chatbot Speedrun Any% (No Glitches)
+# Personal Chatbot
 
-> *"It's not about the destination, it's about the friends we made along the way... and the bugs we introduced."*
+[![Tests](https://github.com/Machine-Learning-Collective/gustaw-mateusz-speedrun/actions/workflows/tests.yml/badge.svg)](https://github.com/Machine-Learning-Collective/gustaw-mateusz-speedrun/actions/workflows/tests.yml)
 
-## 🧙‍♂️ The Party (Who's Grinding This Quest)
+A conversational chatbot built in **ML Kolektyw** (Machine Learning Collective, PJATK) by Gustaw Pluta ([@GustawP](https://github.com/GustawP)) and Mateusz ([@mmalimon](https://github.com/mmalimon)).
 
-| Hero Name | Class | Discord Handle | Sync Days | Raid Time |
-|-----------|-------|----------------|-----------|-----------|
-|Mateusz|Technowizard|vetekinna_60775|24.11|IDK : D |
-|Gustaw|DPS|.gustaw|24.11|IDK : P|
+It talks to an OpenAI model through LangChain, remembers each conversation separately, and can be used from a web UI, a REST API or the terminal. Without an API key it starts in demo mode, so it runs anywhere.
 
----
+The project was built in stages: every technology was researched and validated before any code was written, every component was built and tested in isolation, and only then were the pieces connected.
 
-## 📜 The Lore (What Even Is This)
+## Stack
 
-You've been summoned to build a **Personal Chatbot** — the most basic of bots, yet infinitely extensible. Think of it as the tutorial boss before the real game begins.
+| Layer | Technology | Role |
+|---|---|---|
+| Conversation logic | **LangChain** | Prompt, model abstraction, OpenAI integration |
+| Data contracts | **Pydantic v2** | Validated models for every message crossing a component boundary |
+| UI | **Streamlit** | Chat interface |
+| API | **FastAPI** | REST endpoints with automatic validation and docs |
+| Tests | **pytest** | 54 tests, run in GitHub Actions on every push |
+| Environment | **uv**, Python 3.13 | Dependencies pinned in `uv.lock` |
 
-**The Stack (Your Loadout):**
-- 🧠 **LangChain** — The brain (makes bot go brr)
-- 📝 **Pydantic** — The bouncer (no sus data allowed)
-- 🎨 **Streamlit** — The face (pretty UI, no cap)
-- 🚀 **FastAPI** — The optional drip (API layer if you're feeling spicy)
-- 🧪 **Pytest** — The reality check (tests or it didn't happen)
+## Status
 
-**Your Mission:**
-1. Research everything (no speedrunning this part fr fr)
-2. Build components in isolation (trust the process bestie)
-3. Integrate them (this is where it gets real)
-4. Document your Ls and Ws (self-awareness arc)
+| Milestone | Scope | |
+|---|---|---|
+| 1 | Research and technology validation | ✅ [notes](docs/milestone-1-research.md) |
+| 2 | Isolated components | ✅ |
+| 3 | Integration and demo | ✅ [notes](docs/milestone-3-integration.md) |
+| 4 | Reflection and handoff | ✅ [notes](docs/milestone-4-reflection.md) |
 
----
-
-## ⚔️ The Rules of Engagement
-
-### 🚫 Forbidden Techniques (Instant Game Over)
-- Writing code before researching → *skill issue*
-- Skipping isolation testing → *that's not very cash money*
-- Merging without PR approval → *caught in 4K*
-- Raw dicts crossing boundaries → *Pydantic didn't die for this*
-
-### ✅ Based Moves (XP Multipliers)
-- Asking clarifying questions → *big brain energy, DM papa*
-- Documenting in GitHub issues → *audit trail supremacy*
-- Isolated pytest tests → *chef's kiss*
-- Clean git history → *immaculate vibes*
-
----
-
-## 🏕️ Setting Up Camp (Environment Setup)
-
-### Step 1: Summon UV (Package Manager Diff)
+## Running it
 
 ```bash
-**If you don't have uv yet, install it (it's bussin)**
-`curl -LsSf https://astral.sh/uv/install.sh | sh`
-
-Or if you're on Windows (no shade)
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-
-### Step 2: Create Your Lair
-
-```bash
-# Clone the repo (you know the drill)
-git clone <your-assigned-repo-url>
-cd <repo-name>
-
-# Spawn a virtual environment
-uv venv
-
-# Activate it
-source .venv/bin/activate  # Unix/macOS
-# OR
-.venv\Scripts\activate     # Windows
-```
-
-### Step 3: Add Your Dependencies
-
-```bash
-# Add packages as you need them (research first tho)
-uv add <package-name>
-
-# Need a specific version? Say less
-uv add <package-name>==<version>
-
-# Dev dependencies (testing stuff)
-uv add --dev <package-name>
-```
-
-> 🚨 **IMPORTANT:** You decide which packages and versions to use. That's literally the quest. Check the docs, validate compatibility, ask questions if confused. No hand-holding here bestie.
-
-### Step 4: Lock It In
-
-```bash
-# This creates/updates uv.lock (commit this file)
-uv lock
-
-# Sync your environment from lock file
 uv sync
+
+# Optional: talk to a real model
+cp .env.example .env    # then put your OPENAI_API_KEY in .env
+
+# Web UI
+uv run streamlit run src/Streamlit_Interface/app.py
+
+# REST API (docs at http://localhost:8000/docs)
+uv run uvicorn FastApi_Skeleton.main:app --app-dir src
+
+# Terminal
+uv run python main.py
+
+# Tests
+uv run pytest
 ```
 
----
+Without a key, every interface runs in **demo mode**: the bot repeats your message and says how many earlier messages it can see, which shows that the conversation history reaches the model.
 
-## 🗺️ The Quest Log (Milestones)
+### Configuration
 
-| Phase | Milestone | Vibe Check |
-|-------|-----------|------------|
-| 1️⃣ | Research & Technology Validation | *"I actually read the docs"* |
-| 2️⃣ | Isolated Component Proof | *"It works on my machine (in isolation)"* |
-| 3️⃣ | Integration & Demo | *"Witness me"* |
-| 4️⃣ | Reflection & Handoff | *"Character development arc complete"* |
+| Variable | Default | |
+|---|---|---|
+| `OPENAI_API_KEY` | – | Enables OpenAI |
+| `OPENAI_MODEL` | `gpt-5-mini` | Model name |
+| `LLM_PROVIDER` | auto | `openai` or `demo` |
+| `LLM_TEMPERATURE` | model default | Ignored by models that only accept their default |
+| `LLM_TIMEOUT_SECONDS` | `60` | Per-request timeout |
 
-### 🌿 Branch Strategy (Don't Be Sus)
+## How it fits together
+
+```mermaid
+flowchart LR
+    UI[Streamlit UI] --> S[ChatService]
+    API[FastAPI] --> S
+    CLI[Terminal] --> A
+    S --> A[LangChainAgent]
+    A --> M{OpenAI or demo model}
+```
 
 ```
-main (protected - no direct pushes, srs)
-├── milestone-1/research
-├── milestone-2/isolated-components
-├── milestone-3/integration
-└── milestone-4/reflection
+src/
+├── Pydantic_Base_Models/            Message, ChatRequest, ChatResponse, ConversationConfig
+├── LangChain_Conversational_Agent/  Agent with per-session history; model factory; CLI
+├── Chat_Service/                    Single entry point for API and UI
+├── FastApi_Skeleton/                REST API
+└── Streamlit_Interface/             Web UI
 ```
 
-**Workflow:**
-1. Create branch from \`main\` for your milestone
-2. Work on issues, commit often (atomic commits = based)
-3. Open PR when milestone complete
-4. Get approved by reviewer (that's @ArturNiklewicz)
-5. Merge and level up 🎉
+### API
 
----
+| Method | Path | |
+|---|---|---|
+| `GET` | `/health` | Status and active model |
+| `POST` | `/chat` | Send a message, get the reply and the session history |
+| `GET` | `/sessions/{id}/messages` | Session history |
+| `DELETE` | `/sessions/{id}` | Clear a session |
 
-## 📚 The Sacred Texts (Documentation)
+```bash
+curl -X POST localhost:8000/chat -H 'content-type: application/json' \
+  -d '{"session_id": "demo", "message": {"role": "user", "content": "Hello!"}}'
+```
 
-### Core Technologies
-| Tech | Docs | Why You Need This |
-|------|------|-------------------|
-| 🐍 Python | [docs.python.org](https://docs.python.org/3/) | ...seriously? |
-| 📦 uv | [docs.astral.sh/uv](https://docs.astral.sh/uv/) | Package manager that doesn't make you mass |
-| 🧠 LangChain | [python.langchain.com/docs](https://python.langchain.com/docs/introduction/) | The chatbot brain docs |
-| 📝 Pydantic | [docs.pydantic.dev](https://docs.pydantic.dev/latest/) | Data validation bible (USE V2) |
-| 🧪 Pytest | [docs.pytest.org](https://docs.pytest.org/en/stable/) | Testing framework goat |
-| 🚀 FastAPI | [fastapi.tiangolo.com](https://fastapi.tiangolo.com/) | API framework that's actually good |
-| 🎨 Streamlit | [docs.streamlit.io](https://docs.streamlit.io/) | UI framework for the lazy (affectionate) |
+## Documentation
 
-### Bonus Reading (Side Quests)
-| Resource | Link | Vibe |
-|----------|------|------|
-| Git Branching | [learngitbranching.js.org](https://learngitbranching.js.org/) | Interactive git tutorial |
-| Conventional Commits | [conventionalcommits.org](https://www.conventionalcommits.org/) | Commit message etiquette |
-| Python Type Hints | [mypy.readthedocs.io](https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html) | Types are your friend |
+| Document | |
+|---|---|
+| [milestone-1-research.md](docs/milestone-1-research.md) | All Milestone 1 decisions: provider, versions, testing, architecture |
+| [langchain-core-abstractions.md](docs/langchain-core-abstractions.md) | Chat models, prompts, runnables, memory |
+| [pydantic-message-handling.md](docs/pydantic-message-handling.md) | Message models, validation, serialization |
+| [streamlit-chat-ui-interaction.md](docs/streamlit-chat-ui-interaction.md) | Chat elements, session state, rerun model |
+| [version-compatibility-validation.md](docs/version-compatibility-validation.md) | Version matrix and dependency resolution |
+| [milestone-3-integration.md](docs/milestone-3-integration.md) | Architecture, decisions, bugs found during integration |
+| [milestone-4-reflection.md](docs/milestone-4-reflection.md) | What worked, what did not, known limitations, handoff |
+| [project-brief.md](docs/project-brief.md) | The original brief |
 
----
+## Team
 
-## 🎯 Evaluation Criteria (How You Get Judged)
+| | Role |
+|---|---|
+| Gustaw Pluta | Project lead; research and technology validation (M1); merged integration, fixes, CI and handoff (M3–M4) |
+| Mateusz (@mmalimon) | Isolated components and tests (M2); first end-to-end integration (M3, Dec 2025, branch `milestone-3/End-to-End-Demo`) |
 
-| Criteria | Weight | What We're Looking For |
-|----------|--------|------------------------|
-| 🤔 Asking Clarifying Questions | HIGH | You ask before assuming |
-| 📖 Research Rigor | HIGH | Official docs > Stack Overflow copypasta |
-| 🧩 Code Isolation | HIGH | Components work alone before together |
-| 🌿 Git Hygiene | MEDIUM | Clean history, good PR descriptions |
-| 📝 Documentation | MEDIUM | Your issues tell the story |
-
----
-
-## 💀 Common L's (Don't Be This Person)
-
-- *"I'll just figure it out as I go"* → Research milestone exists for a reason
-- *"Tests are optional right?"* → They are not. Pytest or perish.
-- *"I'll document later"* → You won't. Document in issues AS YOU GO.
-- *"Let me just merge real quick"* → PR gate exists. Respect it.
-
----
-
-## 🏆 GG WP (Success Criteria)
-
-By the end, you should have:
-- [ ] A working chatbot (even if basic)
-- [ ] Clean, isolated components
-- [ ] Documented decision trail in GitHub issues
-- [ ] Honest self-assessment
-- [ ] Zero regrets (okay maybe some regrets)
-
----
-
-> *"The real chatbot was the documentation we wrote along the way."*
->
-> — Ancient Developer Proverb, probably
-
-**Now go touch grass (after you finish the milestone). GLHF! 🚀**
+Work happens on milestone branches and is merged through reviewed pull requests.

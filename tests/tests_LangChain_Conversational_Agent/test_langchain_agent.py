@@ -1,8 +1,10 @@
 import pytest
-from langchain_community.chat_models.fake import FakeListChatModel
+from langchain_core.language_models.fake_chat_models import FakeListChatModel
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from LangChain_Conversational_Agent.langchain_agent import LangChainAgent
-from Pydantic_Base_Models import ConversationConfig, Role
+from Pydantic_Base_Models import MAX_USER_MESSAGE_CHARS, ConversationConfig, Role
+from tests.conftest import FailingChatModel, RecordingChatModel
 
 
 def make_agent(responses=None, max_history_messages=20) -> LangChainAgent:
@@ -89,17 +91,58 @@ def test_multiple_sessions_isolated() -> None:
     assert not any(m.content == "hello B1" for m in history_a)
 
 
-def test_empty_input_does_not_crash() -> None:
+# Milestone 2 had "empty/long input does not crash" tests. send() did not crash, but it stored
+# a message that later made get_history() raise. Invalid input is now rejected up front.
+@pytest.mark.parametrize("text", ["", "   ", "x" * (MAX_USER_MESSAGE_CHARS + 1)])
+def test_invalid_input_rejected_without_touching_history(text: str) -> None:
     agent = make_agent()
-    out = agent.send("", session_id="empty")
-    assert isinstance(out, str)
+    agent.send("valid", session_id="s")
+    with pytest.raises(ValueError):
+        agent.send(text, session_id="s")
+    assert len(agent.get_history(session_id="s")) == 2
 
 
-def test_long_input_does_not_crash() -> None:
-    agent = make_agent()
-    long_text = "x" * 10_000
-    out = agent.send(long_text, session_id="long")
-    assert isinstance(out, str)
+def test_history_readable_after_long_model_reply() -> None:
+    # A real model can answer with far more than the 4000-character limit for user messages.
+    agent = make_agent(responses=["y" * 10_000])
+    agent.send("write me an essay", session_id="long")
+    history = agent.get_history(session_id="long")
+    assert len(history[1].content) == 10_000
+
+
+def test_model_receives_system_prompt_history_and_new_input(recording_llm: RecordingChatModel) -> None:
+    agent = LangChainAgent(recording_llm, ConversationConfig(system_prompt="Be brief."))
+    agent.send("hello", session_id="s")
+    agent.send("and again", session_id="s")
+
+    prompt = recording_llm.calls[-1]
+    assert isinstance(prompt[0], SystemMessage) and prompt[0].content == "Be brief."
+    assert [type(m) for m in prompt[1:]] == [HumanMessage, AIMessage, HumanMessage]
+    assert [m.content for m in prompt[1:]] == ["hello", "first reply", "and again"]
+
+
+def test_braces_in_system_prompt_are_not_template_variables(recording_llm: RecordingChatModel) -> None:
+    agent = LangChainAgent(recording_llm, ConversationConfig(system_prompt='Reply as {"answer": ...}'))
+    agent.send("hi {name}", session_id="s")
+    prompt = recording_llm.calls[-1]
+    assert prompt[0].content == 'Reply as {"answer": ...}'
+    assert prompt[-1].content == "hi {name}"
+
+
+def test_failed_model_call_leaves_history_unchanged() -> None:
+    agent = LangChainAgent(FailingChatModel())
+    with pytest.raises(ConnectionError):
+        agent.send("hello", session_id="s")
+    assert agent.get_history(session_id="s") == []
+
+
+def test_agents_can_share_a_history_store(recording_llm: RecordingChatModel) -> None:
+    store: dict = {}
+    first = LangChainAgent(recording_llm, ConversationConfig(system_prompt="A"), history_store=store)
+    second = LangChainAgent(recording_llm, ConversationConfig(system_prompt="B"), history_store=store)
+    first.send("one", session_id="s")
+    second.send("two", session_id="s")
+    assert [m.content for m in second.get_history("s")] == ["one", "first reply", "two", "second reply"]
 
 
 def test_history_trimming_respects_max_history_messages() -> None:
